@@ -15,7 +15,8 @@ export class Classroom extends BaseScene {
                     path: 'classroom.png'
                 },
                 playerScale: 0.35,
-                locationScale: 1.5
+                locationScale: 1.5,
+                obstacles: []
             }
         )
     }

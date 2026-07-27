@@ -14,7 +14,8 @@ export class Garage extends BaseScene {
                     path: 'garage.png'
                 },
                 playerScale: 0.45,
-                locationScale: 2
+                locationScale: 2,
+                obstacles: []
             }
         )
     }

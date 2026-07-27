@@ -14,7 +14,24 @@ export class Children_room extends BaseScene {
                     path: 'children_room.png'
                 },
                 playerScale: 0.35,
-                locationScale: 1.5
+                locationScale: 1.5,
+
+                obstacles: [
+                    {
+                        x: 500,
+                        y: 400,
+                        width: 200,
+                        height: 100
+                    },
+
+                    {
+                        x: 800,
+                        y: 300,
+                        width: 150,
+                        height: 250
+                    }
+                ]
+
             }
         )
     }

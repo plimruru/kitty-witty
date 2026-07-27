@@ -14,7 +14,8 @@ export class Beach extends BaseScene {
                     path: 'beach.png'
                 },
                 playerScale: 1,
-                locationScale: 1
+                locationScale: 1,
+                obstacles: []
             }
         )
     }

@@ -1,4 +1,6 @@
 import Phaser from 'phaser'
+import { Player } from '../objects/player'
+import { Rectangle } from '../objects/geometry'
 
 import {
     createSceneMenu
@@ -19,14 +21,14 @@ export interface SceneConfig {
     sceneImage : Image,
     playerScale : number,
     locationScale : number
+    obstacles: Rectangle[]
 
 }
 
 export class BaseScene extends Phaser.Scene {
-    private player !: Phaser.Physics.Arcade.Sprite
+    private player!: Player
     private location !: Phaser.GameObjects.Image
     private cursors !: Phaser.Types.Input.Keyboard.CursorKeys
-
     private config !: SceneConfig
 
     constructor(key : string, config : SceneConfig) {
@@ -59,13 +61,12 @@ export class BaseScene extends Phaser.Scene {
 
         this.location.setScale(this.config.locationScale)
 
-        this.player = this.physics.add.sprite(
+        this.player = new Player(
+            this,
             this.location.x,
             this.location.y,
             this.config.playerImage.key
         )
-
-        this.player.setScale(this.config.playerScale)
 
         this.player.setCollideWorldBounds(
             false
@@ -83,7 +84,7 @@ export class BaseScene extends Phaser.Scene {
             }
         )
 
-
+        this.createObstacles()
         createSceneMenu(this)
     }
 
@@ -157,5 +158,28 @@ export class BaseScene extends Phaser.Scene {
             top + playerHalfHeight,
             bottom - playerHalfHeight
         )
+    }
+
+    private createObstacles() {
+        for (const rectangle of this.config.obstacles) {
+            const obstacle = this.add.rectangle(
+                rectangle.x,
+                rectangle.y,
+                rectangle.width,
+                rectangle.height
+            )
+
+            obstacle.setVisible(false)
+
+            this.physics.add.existing(
+                obstacle,
+                true
+            )
+
+            this.physics.add.collider(
+                this.player,
+                obstacle
+            )
+        }
     }
 }
