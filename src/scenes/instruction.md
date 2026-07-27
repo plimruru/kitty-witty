@@ -15,13 +15,13 @@ classroom_scene.ts
 garage_scene.ts
 *Гараж, где берется инвентарь для костюма*
 
-bedroom_scene.ts 
+children_room_scene.ts 
 *Комната котёнка. Дневник. Инвентарь.*
 
 beach_scene.ts
 *Берег с рыбаками*
 
-dive_scene.ts
+sea_scene.ts
 *Подводный мир.*
 
 ending_scene.ts
