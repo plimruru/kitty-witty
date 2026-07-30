@@ -161,20 +161,23 @@ export class BaseScene extends Phaser.Scene {
     }
 
     private createObstacles() {
+        const scale = this.config.locationScale
+
+        const left = this.location.x - this.location.width / 2 * scale
+        const top  = this.location.y - this.location.height / 2 * scale
+
         for (const rectangle of this.config.obstacles) {
+
             const obstacle = this.add.rectangle(
-                rectangle.x,
-                rectangle.y,
-                rectangle.width,
-                rectangle.height
+                left + rectangle.x * scale + rectangle.width * scale / 2,
+                top  + rectangle.y * scale + rectangle.height * scale / 2,
+                rectangle.width * scale,
+                rectangle.height * scale
             )
 
-            obstacle.setVisible(false)
+            obstacle.setFillStyle(0xff0000, 0.3)
 
-            this.physics.add.existing(
-                obstacle,
-                true
-            )
+            this.physics.add.existing(obstacle, true)
 
             this.physics.add.collider(
                 this.player,
