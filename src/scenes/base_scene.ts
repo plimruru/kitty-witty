@@ -20,8 +20,9 @@ export interface SceneConfig {
     playerImage : Image,
     sceneImage : Image,
     playerScale : number,
-    locationScale : number
-    obstacles: Rectangle[]
+    locationScale : number,
+    obstacles: Rectangle[],
+    scrollable?: boolean
 
 }
 
@@ -60,6 +61,8 @@ export class BaseScene extends Phaser.Scene {
         )
 
         this.location.setScale(this.config.locationScale)
+        const worldWidth = this.location.displayWidth
+        const worldHeight = this.location.displayHeight
 
         this.player = new Player(
             this,
@@ -68,9 +71,36 @@ export class BaseScene extends Phaser.Scene {
             this.config.playerImage.key
         )
 
-        this.player.setCollideWorldBounds(
-            false
-        )
+        //this.player.setCollideWorldBounds(false)
+
+        if (this.config.scrollable) {
+
+            this.physics.world.setBounds(
+                this.location.x - worldWidth / 2,
+                this.location.y - worldHeight / 2,
+                worldWidth,
+                worldHeight
+            )
+
+            this.cameras.main.setBounds(
+                this.location.x - worldWidth / 2,
+                this.location.y - worldHeight / 2,
+                worldWidth,
+                worldHeight
+            )
+
+            this.cameras.main.startFollow(
+                this.player,
+                true,
+                0.1,
+                0.1
+            )
+
+            this.player.setCollideWorldBounds(true)
+        }
+        else {
+            this.player.setCollideWorldBounds(false)
+        }
 
         this.cursors =
             this.input.keyboard!.createCursorKeys()
@@ -121,7 +151,10 @@ export class BaseScene extends Phaser.Scene {
             velocity.y
         )
 
-        this.constraintPlayerToBounds()
+        //this.constraintPlayerToBounds()
+        if (!this.config.scrollable) {
+            this.constraintPlayerToBounds()
+        }
     }
 
     private constraintPlayerToBounds() {
@@ -174,6 +207,7 @@ export class BaseScene extends Phaser.Scene {
                 rectangle.width * scale,
                 rectangle.height * scale
             )
+            obstacle.setScrollFactor(1)
 
             //obstacle.setFillStyle(0xff0000, 0.3)
 
