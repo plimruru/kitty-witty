@@ -14,7 +14,7 @@ export class Sea extends BaseScene {
                     path: 'sea.png'
                 },
                 playerScale: 1,
-                locationScale: 1.35,
+                locationScale: 0.7,
                 obstacles: [
                     {
                         x: 740,

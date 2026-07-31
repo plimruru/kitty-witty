@@ -175,7 +175,7 @@ export class BaseScene extends Phaser.Scene {
                 rectangle.height * scale
             )
 
-            obstacle.setFillStyle(0xff0000, 0.3)
+            //obstacle.setFillStyle(0xff0000, 0.3)
 
             this.physics.add.existing(obstacle, true)
 
