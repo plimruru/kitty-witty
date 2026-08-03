@@ -8,6 +8,7 @@ import {
     GAME_WIDTH,
     GAME_HEIGHT
 } from './utils/constants'
+import { loadPixelFont } from './ui'
 //import { MenuScene } from './scenes/menu_scene'
 
 
@@ -42,4 +43,14 @@ const config: Phaser.Types.Core.GameConfig = {
     ]
 }
 
-new Phaser.Game(config)
+async function startGame() {
+    try {
+        await loadPixelFont()
+    } catch (error) {
+        console.warn('Игра запущена с резервным шрифтом:', error)
+    }
+
+    new Phaser.Game(config)
+}
+
+void startGame()
