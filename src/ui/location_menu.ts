@@ -60,6 +60,15 @@ export const DEFAULT_MAP_LOCATIONS: MapLocationView[] = [
         y: 350,
         width: 210,
         height: 145
+    },
+    {
+        key: 'sea',
+        name: 'Море',
+        x: 350,
+        y: 380,
+        width: 100,
+        height: 120,
+        locked: true
     }
 ]
 
@@ -96,6 +105,46 @@ export class LocationMenu extends UIModal {
         ).setDisplaySize(displayWidth, displayHeight)
         this.content.add(map)
 
+        // Кликабельная область на всю карту
+        // При клике в любом месте карты определяем ближайшую локацию
+        const mapHit = scene.add.rectangle(
+            left,
+            top,
+            displayWidth,
+            displayHeight,
+            0xffffff,
+            0.001
+        ).setOrigin(0).setInteractive({ useHandCursor: true })
+
+        mapHit.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+            // Определяем ближайшую доступную локацию
+            let nearest: MapLocationView | null = null
+            let minDist = Infinity
+
+            for (const location of options.locations) {
+                if (location.locked) continue
+
+                const locCenterX = left + (location.x + location.width / 2) * scale
+                const locCenterY = top + (location.y + location.height / 2) * scale
+
+                const dist = Phaser.Math.Distance.Between(
+                    pointer.x, pointer.y,
+                    locCenterX, locCenterY
+                )
+
+                if (dist < minDist) {
+                    minDist = dist
+                    nearest = location
+                }
+            }
+
+            if (nearest) {
+                options.onSelect(nearest.key)
+                this.close()
+            }
+        })
+
+        // Показываем области локаций с подсветкой при наведении
         options.locations.forEach((location) => {
             const areaX = left + location.x * scale
             const areaY = top + location.y * scale
@@ -119,7 +168,6 @@ export class LocationMenu extends UIModal {
                     color,
                     location.current ? 0.9 : 0
                 )
-                .setInteractive({ useHandCursor: !location.locked })
             const label = scene.add.text(
                 areaX + areaWidth / 2,
                 areaY + areaHeight / 2,
@@ -131,6 +179,8 @@ export class LocationMenu extends UIModal {
                 }
             ).setOrigin(0.5).setVisible(false)
 
+            // Подсветка при наведении на область
+            area.setInteractive({ useHandCursor: !location.locked })
             area.on('pointerover', () => {
                 area.setFillStyle(color, location.locked ? 0.16 : 0.28)
                 label.setVisible(true)
@@ -144,6 +194,7 @@ export class LocationMenu extends UIModal {
                 options.onSelect(location.key)
                 this.close()
             })
+
             this.content.add([area, label])
         })
     }

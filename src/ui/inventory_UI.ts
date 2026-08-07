@@ -27,15 +27,20 @@ export class InventoryUI extends UIModal {
             { backgroundTexture: UI_TEXTURES.inventoryWindow }
         )
 
+        // 3 ряда по 4 слота = 12 слотов
         const positions = [
-            { x: 600, y: 493 },
-            { x: 840, y: 493 },
-            { x: 1080, y: 493 },
-            { x: 1320, y: 493 },
-            { x: 600, y: 710 },
-            { x: 840, y: 710 },
-            { x: 1080, y: 710 },
-            { x: 1320, y: 710 }
+            { x: 600, y: 420 },
+            { x: 840, y: 420 },
+            { x: 1080, y: 420 },
+            { x: 1320, y: 420 },
+            { x: 600, y: 600 },
+            { x: 840, y: 600 },
+            { x: 1080, y: 600 },
+            { x: 1320, y: 600 },
+            { x: 600, y: 780 },
+            { x: 840, y: 780 },
+            { x: 1080, y: 780 },
+            { x: 1320, y: 780 }
         ]
 
         positions.forEach((position, index) => {

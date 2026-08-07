@@ -17,6 +17,16 @@ const ALL_ITEMS: InventoryItem[] = [
   { id: 'sunglasses',  name: 'Очки',           textureKey: 'glasses' },
   { id: 'bag',         name: 'Пакет',          textureKey: 'bag' },
   { id: 'shells',      name: 'Ракушки',        textureKey: 'shells' },
+  { id: 'balloon',     name: 'Баллон',         textureKey: 'balloon' },
+  { id: 'suit',        name: 'Водолазный костюм', textureKey: 'suit' },
+];
+
+// Части костюма (4 штуки)
+export const SUIT_PARTS = [
+  { id: 'aquarium', name: 'Аквариум (шлем)' },
+  { id: 'flippers', name: 'Ласты + Перчатки' },
+  { id: 'balloon',  name: 'Баллон' },
+  { id: 'suit',     name: 'Цельный костюм' },
 ];
 
 class InventoryManager {
@@ -56,6 +66,8 @@ class InventoryManager {
   assembleSuit() {
     if (this.assembled || !this.hasAllItems()) return;
     this.assembled = true;
+    // Добавляем костюм в инвентарь
+    this.addItem('suit');
     this.events.emit('suitAssembled');
   }
 
@@ -63,7 +75,19 @@ class InventoryManager {
   forceAssembleSuit() {
     if (this.assembled) return;
     this.assembled = true;
+    // Добавляем костюм в инвентарь
+    this.addItem('suit');
     this.events.emit('suitAssembled');
+  }
+
+  /** Проверяет, собраны ли все 4 части костюма */
+  hasSuitParts(): boolean {
+    return (
+      this.isCollected('aquarium') &&
+      this.isCollected('flippers') &&
+      this.isCollected('balloon') &&
+      this.assembled
+    );
   }
 
   openUI() {

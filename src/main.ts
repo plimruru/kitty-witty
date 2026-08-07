@@ -9,7 +9,6 @@ import {
     GAME_HEIGHT
 } from './utils/constants'
 import { loadPixelFont } from './ui'
-//import { MenuScene } from './scenes/menu_scene'
 
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -34,7 +33,6 @@ const config: Phaser.Types.Core.GameConfig = {
     },
 
     scene: [
-        //MenuScene,
         Classroom,
         Beach,
         Children_room,

@@ -1,4 +1,8 @@
 import { BaseScene } from './base_scene'
+import { MiniGameFactory, MiniGameType } from '../minigames'
+import { inventoryManager } from '../managers/inventory_manager'
+import { journalManager } from '../managers/journal_manager'
+import { setGameUIState } from '../ui'
 
 export class Garage extends BaseScene {
     constructor() {
@@ -88,5 +92,83 @@ export class Garage extends BaseScene {
                 ]
             }
         )
+    }
+
+    create() {
+        super.create()
+
+        // 🔧 Отец-инженер — собирает костюм за Spy Hunter
+        this.addInteractionZone(
+            300, 400, 100, 80,
+            () => this.startSpyHunter(),
+            'Поговорить с отцом'
+        )
+
+        // 👤 Визуальный NPC — отец-инженер
+        this.addNPC(
+            300, 400,
+            {
+                name: 'Отец',
+                color: 0x4d9290
+            }
+        )
+
+        // 🚪 Вход в детскую
+        this.addLocationExit(
+            750, 300,
+            'В детскую',
+            { color: 0xdd85b6 }
+        )
+
+        // 🚪 Вход в школу
+        this.addLocationExit(
+            50, 500,
+            'В школу',
+            { color: 0xf3c969 }
+        )
+    }
+
+    private startSpyHunter() {
+        const ui = this.getGameUI()
+
+        const dialogue = ui.showDialogue(this, {
+            speaker: 'Отец-инженер',
+            text: 'Собери все детали вместе! Проведи подводный аппарат через препятствия — и я помогу тебе собрать костюм!'
+        }, {
+            onNext: () => {
+                dialogue.close()
+                this.launchSpyHunter()
+            }
+        })
+    }
+
+    private launchSpyHunter() {
+        const ui = this.getGameUI()
+
+        MiniGameFactory.create(this, MiniGameType.SPY_HUNTER, {
+            onComplete: () => {
+                // Собираем цельный костюм
+                inventoryManager.forceAssembleSuit()
+                journalManager.completeChapter(4)
+
+                // Открываем локацию Sea
+                setGameUIState(this, {
+                    inventory: inventoryManager.getAllItems().map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        description: item.collected ? 'Найден' : 'Не найден',
+                        found: item.collected,
+                        iconKey: item.collected ? item.textureKey : undefined
+                    })),
+                    notebook: journalManager.getChapterView(),
+                    unlockedLocations: ['classroom', 'beach', 'children_room', 'garage', 'sea']
+                })
+
+                ui.showToast(this, '🎉 КОСТЮМ СОБРАН!', journalManager.getGrandpaStory('suit'))
+            },
+            onFail: () => {
+                // Можно переиграть
+            }
+        })
     }
 }

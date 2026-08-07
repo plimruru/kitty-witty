@@ -1,4 +1,8 @@
 import { BaseScene } from './base_scene'
+import { MiniGameFactory, MiniGameType } from '../minigames'
+import { inventoryManager } from '../managers/inventory_manager'
+import { journalManager } from '../managers/journal_manager'
+import { setGameUIState } from '../ui'
 
 export class Beach extends BaseScene {
     constructor() {
@@ -15,6 +19,7 @@ export class Beach extends BaseScene {
                 },
                 playerScale: 1,
                 locationScale: 1.30,
+                // scrollable: true — чтобы можно было дойти до входа в море
                 scrollable: true,
                 obstacles: [
 
@@ -202,5 +207,104 @@ export class Beach extends BaseScene {
                 ]
             }
         )
+    }
+
+    create() {
+        super.create()
+
+        // 🐚 Продавец ракушек — чуть выше центра, чтобы окно мини-игры было по центру
+        this.addInteractionZone(
+            800, 350, 100, 80,
+            () => this.startArkanoid(),
+            'Поговорить с продавцом ракушек'
+        )
+
+        // 👤 Визуальный NPC — продавец ракушек
+        this.addNPC(
+            800, 350,
+            {
+                name: 'Продавец ракушек',
+                color: 0xe88762
+            }
+        )
+
+        // 🌊 Переход в море (доступен после сборки костюма)
+        this.addInteractionZone(
+            2200, 600, 120, 100,
+            () => this.tryEnterSea(),
+            'Войти в море'
+        )
+
+        // 🚪 Визуальный маркер входа в море
+        this.addLocationExit(
+            2200, 600,
+            'В море',
+            {
+                color: 0x4d9290,
+                locked: !inventoryManager.isSuitAssembled()
+            }
+        )
+
+        // 🚪 Вход в школу
+        this.addLocationExit(
+            100, 300,
+            'В школу',
+            { color: 0xf3c969 }
+        )
+    }
+
+    private startArkanoid() {
+        const ui = this.getGameUI()
+
+        const dialogue = ui.showDialogue(this, {
+            speaker: 'Продавец ракушек',
+            text: 'Ласты и перчатки? Помоги разбить ракушки для моего лотка — и они твои!'
+        }, {
+            onNext: () => {
+                dialogue.close()
+                this.launchArkanoid()
+            }
+        })
+    }
+
+    private launchArkanoid() {
+        const ui = this.getGameUI()
+
+        MiniGameFactory.create(this, MiniGameType.ARKANOID, {
+            onComplete: () => {
+                // Добавляем награды в инвентарь
+                inventoryManager.addItem('flippers')
+                inventoryManager.addItem('gloves')
+                journalManager.completeChapter(2)
+
+                // Обновляем UI-состояние с иконками предметов
+                setGameUIState(this, {
+                    inventory: inventoryManager.getAllItems().map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        description: item.collected ? 'Найден' : 'Не найден',
+                        found: item.collected,
+                        iconKey: item.collected ? item.textureKey : undefined
+                    })),
+                    notebook: journalManager.getChapterView(),
+                    unlockedLocations: ['classroom', 'beach', 'children_room', 'garage']
+                })
+
+                ui.showToast(this, 'Ласты и перчатки получены!', journalManager.getGrandpaStory('flippers'))
+            },
+            onFail: () => {
+                // Можно переиграть
+            }
+        })
+    }
+
+    private tryEnterSea() {
+        const ui = this.getGameUI()
+
+        if (inventoryManager.isSuitAssembled()) {
+            this.scene.start('sea')
+        } else {
+            ui.showToast(this, 'Костюм не собран!', 'Собери все части водолазного костюма, чтобы войти в море!')
+        }
     }
 }

@@ -33,45 +33,46 @@ export class DialogueBox extends Phaser.GameObjects.Container {
         scene.add.existing(this)
         this.setDepth(900)
 
+        // Увеличенное диалоговое окно
         const panel = scene.add.image(
             960,
             920,
             UI_TEXTURES.modalBackground
-        ).setDisplaySize(1250, 200)
+        ).setDisplaySize(1400, 240)
 
         const portraitTexture = line.portraitKey &&
             scene.textures.exists(line.portraitKey)
             ? line.portraitKey
             : UI_TEXTURES.heroIcon
-        this.portrait = scene.add.image(440, 915, portraitTexture)
-            .setDisplaySize(118, 118)
+        this.portrait = scene.add.image(400, 915, portraitTexture)
+            .setDisplaySize(130, 130)
 
         this.speakerText = scene.add.text(
-            530,
-            850,
+            510,
+            830,
             '',
-            uiTextStyle(20, '#bd6047', true)
+            uiTextStyle(22, '#bd6047', true)
         )
         this.bodyText = scene.add.text(
-            530,
-            890,
+            510,
+            875,
             '',
             {
-                ...uiTextStyle(26),
-                wordWrap: { width: 930 },
-                lineSpacing: 7
+                ...uiTextStyle(28),
+                wordWrap: { width: 1100 },
+                lineSpacing: 10
             }
         )
-        const next = new UIButton(scene, 1430, 948, {
-            width: 112,
-            height: 48,
+        const next = new UIButton(scene, 1430, 960, {
+            width: 130,
+            height: 52,
             label: 'Далее',
             fill: UI_COLORS.sun,
             onClick: () => {
                 this.options.onNext?.()
                 if (!this.options.onNext) this.close()
             },
-            fontSize: 19
+            fontSize: 20
         })
 
         this.add([

@@ -1,5 +1,8 @@
 import { BaseScene } from './base_scene'
-
+import { MiniGameFactory, MiniGameType } from '../minigames'
+import { inventoryManager } from '../managers/inventory_manager'
+import { journalManager } from '../managers/journal_manager'
+import { setGameUIState } from '../ui'
 
 export class Classroom extends BaseScene {
     constructor() {
@@ -17,7 +20,7 @@ export class Classroom extends BaseScene {
                 playerScale: 1,
                 locationScale: 1.35,
                 obstacles: [
-                        {
+                    {
                         x: 218,
                         y: 384,
                         width: 89,
@@ -68,13 +71,6 @@ export class Classroom extends BaseScene {
 
                     {
                         x: 216,
-                        y: 638,
-                        width: 89,
-                        height: 90
-                    },
-
-                    {
-                        x: 381,
                         y: 638,
                         width: 89,
                         height: 90
@@ -131,5 +127,83 @@ export class Classroom extends BaseScene {
                 ]
             }
         )
+    }
+
+    create() {
+        super.create()
+
+        // 🐱 Котёнок-учитель — выдаёт аквариум (шлем) за Feed and Grow
+        this.addInteractionZone(
+            350, 480, 80, 80,
+            () => this.startFeedAndGrow(),
+            'Поговорить с учителем'
+        )
+
+        // 👤 Визуальный NPC — учитель
+        this.addNPC(
+            350, 480,
+            {
+                name: 'Учитель',
+                color: 0x4d9290
+            }
+        )
+
+        // 🚪 Вход в детскую
+        this.addLocationExit(
+            750, 300,
+            'В детскую',
+            { color: 0x4d9290 }
+        )
+
+        // 🚪 Вход в гараж
+        this.addLocationExit(
+            50, 500,
+            'В гараж',
+            { color: 0xe88762 }
+        )
+    }
+
+    private startFeedAndGrow() {
+        const ui = this.getGameUI()
+
+        const dialogue = ui.showDialogue(this, {
+            speaker: 'Котёнок-учитель',
+            text: 'Чтобы исследовать море, тебе нужен шлем! Покорми рыбок, чтобы они выросли — и получишь аквариум!'
+        }, {
+            onNext: () => {
+                dialogue.close()
+                this.launchFeedAndGrow()
+            }
+        })
+    }
+
+    private launchFeedAndGrow() {
+        const ui = this.getGameUI()
+
+        MiniGameFactory.create(this, MiniGameType.FEED_AND_GROW, {
+            onComplete: () => {
+                // Добавляем награду в инвентарь
+                inventoryManager.addItem('aquarium')
+                journalManager.completeChapter(1)
+
+                // Обновляем UI-состояние с иконками предметов
+                setGameUIState(this, {
+                    inventory: inventoryManager.getAllItems().map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        description: item.collected ? 'Найден' : 'Не найден',
+                        found: item.collected,
+                        iconKey: item.collected ? item.textureKey : undefined
+                    })),
+                    notebook: journalManager.getChapterView(),
+                    unlockedLocations: ['classroom', 'beach', 'children_room', 'garage']
+                })
+
+                ui.showToast(this, 'Аквариум получен!', journalManager.getGrandpaStory('aquarium'))
+            },
+            onFail: () => {
+                // Можно переиграть
+            }
+        })
     }
 }

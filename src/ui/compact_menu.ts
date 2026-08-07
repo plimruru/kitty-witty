@@ -27,6 +27,8 @@ export class CompactMenu extends Phaser.GameObjects.Container {
             0,
             UI_TEXTURES.menuInactive
         ).setOrigin(1, 0).setDisplaySize(72, 72)
+        this.toggleImage.setScrollFactor(0)
+
         const toggleHit = scene.add.rectangle(
             -72,
             0,
@@ -35,19 +37,26 @@ export class CompactMenu extends Phaser.GameObjects.Container {
             0xffffff,
             0.001
         ).setOrigin(0).setInteractive({ useHandCursor: true })
+        toggleHit.setScrollFactor(0)
 
         this.panel = scene.add.container(0, 80)
+        this.panel.setScrollFactor(0)
+
         const panelImage = scene.add.image(
             0,
             0,
             UI_TEXTURES.menuPanel
         ).setOrigin(1, 0).setDisplaySize(264, 336)
+        panelImage.setScrollFactor(0)
+
         const title = scene.add.text(
             -225,
             24,
             'МЕНЮ',
             uiTextStyle(18, '#684d4b', true)
         )
+        title.setScrollFactor(0)
+
         this.panel.add([panelImage, title])
 
         const entries = [
@@ -61,12 +70,16 @@ export class CompactMenu extends Phaser.GameObjects.Container {
                 entry.y,
                 UI_TEXTURES.menuItemInactive
             ).setOrigin(1, 0).setDisplaySize(216, 72)
+            image.setScrollFactor(0)
+
             const label = scene.add.text(
                 -132,
                 entry.y + 36,
                 entry.label,
                 uiTextStyle(18, '#684d4b', true)
             ).setOrigin(0.5)
+            label.setScrollFactor(0)
+
             const hit = scene.add.rectangle(
                 -240,
                 entry.y,
@@ -75,6 +88,7 @@ export class CompactMenu extends Phaser.GameObjects.Container {
                 0xffffff,
                 0.001
             ).setOrigin(0).setInteractive({ useHandCursor: true })
+            hit.setScrollFactor(0)
 
             hit.on('pointerover', () => {
                 image.setTexture(UI_TEXTURES.menuItemPressed)
